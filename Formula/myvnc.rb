@@ -5,7 +5,11 @@ class Myvnc < Formula
   sha256 "75d04606885054a3f7af84aa3fbd3a6000a4f06bedae66f73ae721071338f14d"
 
   def install
-    libexec.install "server.py", "index.html"
+    libexec.install "server.py", "index.html", "ime.swift"
+    # session-helper (IME sync / lock state) — optional, needs Xcode CLT
+    if which("swiftc")
+      system "swiftc", "-O", libexec/"ime.swift", "-o", libexec/"session-helper"
+    end
     (bin/"myvnc").write <<~EOS
       #!/bin/bash
       exec /usr/bin/python3 "#{libexec}/server.py" "$@"
