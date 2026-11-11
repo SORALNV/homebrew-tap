@@ -1,9 +1,8 @@
 class Myvnc < Formula
-  desc "Live screen viewer server for macOS (MJPEG over HTTP, token auth, Tailscale-only bind)"
+  desc "Live screen viewer server (MJPEG over HTTP, token auth)"
   homepage "https://github.com/SORALNV/MyVNC"
   url "https://github.com/SORALNV/MyVNC/archive/refs/tags/v0.1.0.tar.gz"
   sha256 "75d04606885054a3f7af84aa3fbd3a6000a4f06bedae66f73ae721071338f14d"
-  version "0.1.0"
 
   def install
     libexec.install "server.py", "index.html"
@@ -21,51 +20,24 @@ class Myvnc < Formula
         grep "viewer URL" #{var}/log/myvnc.out.log
 
       The server generates #{etc}/myvnc/config.json on first start (chmod 600).
-      It binds to the Tailscale IP only (config: bind_ip) and requires cua-driver
+      It binds to the Tailscale IP only (config: bind_ip) and needs cua-driver
       for screen capture (config: cua_driver, default ~/.local/bin/cua-driver).
-
-      Open the viewer URL in a browser on any tailnet device.
     EOS
   end
 
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>/usr/bin/python3</string>
-          <string>#{libexec}/server.py</string>
-        </array>
-        <key>EnvironmentVariables</key>
-        <dict>
-          <key>MYVNC_CONFIG</key>
-          <string>#{etc}/myvnc/config.json</string>
-          <key>MYVNC_FRAME_DIR</key>
-          <string>#{var}/myvnc/frames</string>
-        </dict>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>KeepAlive</key>
-        <true/>
-        <key>ThrottleInterval</key>
-        <integer>10</integer>
-        <key>StandardOutPath</key>
-        <string>#{var}/log/myvnc.out.log</string>
-        <key>StandardErrorPath</key>
-        <string>#{var}/log/myvnc.err.log</string>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run ["/usr/bin/python3", libexec/"server.py"]
+    environment_variables MYVNC_CONFIG: etc/"myvnc/config.json",
+                          MYVNC_FRAME_DIR: var/"myvnc/frames"
+    keep_alive true
+    process_type :background
+    log_path var/"log/myvnc.out.log"
+    error_log_path var/"log/myvnc.err.log"
+    working_dir libexec
   end
 
   test do
     require "json"
-    require "net/http"
     require "securerandom"
 
     port = free_port
@@ -81,7 +53,7 @@ class Myvnc < Formula
     (testpath/"config.json").write(JSON.pretty_generate(config))
 
     env = {
-      "MYVNC_CONFIG" => (testpath/"config.json").to_s,
+      "MYVNC_CONFIG"    => (testpath/"config.json").to_s,
       "MYVNC_FRAME_DIR" => (testpath/"frames").to_s,
     }
     pid = Process.spawn(env, "/usr/bin/python3", libexec/"server.py")
@@ -93,8 +65,8 @@ class Myvnc < Formula
       )
       assert_match(/"frames"/, health)
 
-      res = Net::HTTP.get_response(URI("#{uri}/health"))
-      assert_equal "401", res.code
+      body = shell_output("curl -s #{uri}/health")
+      assert_match(/401/, body)
 
       page = shell_output("curl -fsS '#{uri}/?token=#{token}'")
       assert_match(%r{/stream\?token=}, page)
