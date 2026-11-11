@@ -9,6 +9,7 @@ SORALNV の自作アプリ配布用 Homebrew Tap。**GitHub Releases + Tap の�
 ```bash
 # 初回インストール
 brew tap SORALNV/tap
+brew trust soralnv/tap        # Homebrew 7系で必須 (サードパーティtapの明示的信頼)
 brew install SORALNV/tap/myvnc      # GUI/CLIが自動判別されるFormula
 brew install SORALNV/tap/disk-smi
 
