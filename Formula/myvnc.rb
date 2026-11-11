@@ -26,8 +26,8 @@ class Myvnc < Formula
   end
 
   service do
-    run ["/usr/bin/python3", libexec/"server.py"]
-    environment_variables MYVNC_CONFIG: etc/"myvnc/config.json",
+    run ["/usr/bin/python3", opt_libexec/"server.py"]
+    environment_variables MYVNC_CONFIG:    etc/"myvnc/config.json",
                           MYVNC_FRAME_DIR: var/"myvnc/frames"
     keep_alive true
     process_type :background
