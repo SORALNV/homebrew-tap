@@ -1,0 +1,10 @@
+{
+  "myvnc": {
+    "repo": "SORALNV/MyVNC",
+    "tag_prefix": "v"
+  },
+  "disk-smi": {
+    "repo": "SORALNV/disk-smi",
+    "tag_prefix": "v"
+  }
+}

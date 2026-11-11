@@ -1,0 +1,42 @@
+name: update-formulas
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [app-release]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-formulas
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update formulas from latest releases
+        run: python3 scripts/update_formulas.py
+
+      - name: Validate formula syntax
+        run: |
+          for f in Formula/*.rb; do
+            ruby -c "$f" >/dev/null || { echo "syntax error: $f"; exit 1; }
+          done
+
+      - name: Commit and push
+        run: |
+          if git diff --quiet; then
+            echo "formulas already up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/
+          git commit -m "auto: update formulas from latest releases"
+          git push
