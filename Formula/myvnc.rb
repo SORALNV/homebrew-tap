@@ -33,7 +33,7 @@ class Myvnc < Formula
     process_type :background
     log_path var/"log/myvnc.out.log"
     error_log_path var/"log/myvnc.err.log"
-    working_dir libexec
+    working_dir opt_libexec
   end
 
   test do
