@@ -2,7 +2,7 @@ class Myvnc < Formula
   desc "Live screen viewer server for macOS (MJPEG over HTTP, token auth, Tailscale-only bind)"
   homepage "https://github.com/SORALNV/MyVNC"
   url "https://github.com/SORALNV/MyVNC/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "PENDING_FIRST_RELEASE"
+  sha256 "75d04606885054a3f7af84aa3fbd3a6000a4f06bedae66f73ae721071338f14d"
   version "0.1.0"
 
   def install
