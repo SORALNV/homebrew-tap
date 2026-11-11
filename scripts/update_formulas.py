@@ -57,7 +57,8 @@ def update_formula(name, cfg):
 
     content = formula.read_text()
     tag_suffix = f"/archive/refs/tags/{tag}.tar.gz"
-    if tag_suffix in content:
+    sha_valid = re.search(r'^\s*sha256 "([0-9a-f]{64})"\s*$', content, flags=re.M)
+    if tag_suffix in content and sha_valid:
         print(f"ok {name}: already at {tag}")
         return False
 
