@@ -65,6 +65,7 @@ class Myvnc < Formula
 
   test do
     require "json"
+    require "net/http"
     require "securerandom"
 
     port = free_port
@@ -86,27 +87,24 @@ class Myvnc < Formula
     pid = Process.spawn(env, "/usr/bin/python3", libexec/"server.py")
     begin
       uri = "http://127.0.0.1:#{port}"
-      health = nil
-      30.times do
-        sleep 0.3
-        begin
-          health = shell_output("curl -fsS '#{uri}/health?token=#{token}'", 0)
-          break
-        rescue
-          nil
-        end
-      end
-      assert health, "server did not come up"
+      # curl handles the startup wait itself (retries on connection refused)
+      health = shell_output(
+        "curl -fsS --retry 20 --retry-delay 1 --retry-connrefused '#{uri}/health?token=#{token}'"
+      )
       assert_match(/"frames"/, health)
 
-      code = shell_output("curl -s -o /dev/null -w '%{http_code}' #{uri}/health").strip
-      assert_equal "401", code
+      res = Net::HTTP.get_response(URI("#{uri}/health"))
+      assert_equal "401", res.code
 
       page = shell_output("curl -fsS '#{uri}/?token=#{token}'")
       assert_match(%r{/stream\?token=}, page)
     ensure
-      Process.kill("TERM", pid) rescue nil
-      Process.wait(pid) rescue nil
+      begin
+        Process.kill("TERM", pid)
+        Process.wait(pid)
+      rescue StandardError
+        nil
+      end
     end
   end
 end
