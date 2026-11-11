@@ -71,12 +71,12 @@ class Myvnc < Formula
     port = free_port
     token = SecureRandom.hex(16)
     config = {
-      "bind_ip" => "127.0.0.1",
-      "port" => port,
-      "token" => token,
-      "interval_sec" => 3600,
+      "bind_ip"             => "127.0.0.1",
+      "port"                => port,
+      "token"               => token,
+      "interval_sec"        => 3600,
       "max_image_dimension" => 320,
-      "cua_driver" => "/usr/bin/true",
+      "cua_driver"          => "/usr/bin/true",
     }
     (testpath/"config.json").write(JSON.pretty_generate(config))
 
@@ -89,7 +89,7 @@ class Myvnc < Formula
       uri = "http://127.0.0.1:#{port}"
       # curl handles the startup wait itself (retries on connection refused)
       health = shell_output(
-        "curl -fsS --retry 20 --retry-delay 1 --retry-connrefused '#{uri}/health?token=#{token}'"
+        "curl -fsS --retry 20 --retry-delay 1 --retry-connrefused '#{uri}/health?token=#{token}'",
       )
       assert_match(/"frames"/, health)
 
@@ -102,7 +102,7 @@ class Myvnc < Formula
       begin
         Process.kill("TERM", pid)
         Process.wait(pid)
-      rescue StandardError
+      rescue
         nil
       end
     end
