@@ -1,8 +1,8 @@
 class Myvnc < Formula
   desc "Live screen viewer server (MJPEG over HTTP, token auth)"
   homepage "https://github.com/SORALNV/MyVNC"
-  url "https://github.com/SORALNV/MyVNC/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "75d04606885054a3f7af84aa3fbd3a6000a4f06bedae66f73ae721071338f14d"
+  url "https://github.com/SORALNV/MyVNC/archive/refs/tags/v0.3.0.tar.gz"
+  sha256 "803066b06d5b9c141c57572404ffc1cfd6330c419dd12d1caff990a7f5eb289a"
 
   def install
     libexec.install "server.py", "index.html", "ime.swift"
