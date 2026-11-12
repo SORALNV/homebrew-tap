@@ -24,7 +24,7 @@ brew services start SORALNV/tap/myvnc
 
 | Formula | 種別 | 説明 | ソース |
 |---|---|---|---|
-| `myvnc` | CLI (サーバー) | ライブ画面ビューア (MJPEG, トークン認証, Tailscale限定バインド) | [SORALNV/MyVNC](https://github.com/SORALNV/MyVNC) |
+| `myvnc` | CLI (サーバー) | ライブ画面ビューア+フルリモート操作 (MJPEG, クリック/ドラッグ/スクロール/キー/クリップボード同期/日英IME同期, トークン認証, Tailscale限定) | [SORALNV/MyVNC](https://github.com/SORALNV/MyVNC) |
 | `disk-smi` | CLI | SSDのS.M.A.R.T.状態ビューア | [SORALNV/disk-smi](https://github.com/SORALNV/disk-smi) |
 
 ## 自動更新の仕組み
